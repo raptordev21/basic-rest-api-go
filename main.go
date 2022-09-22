@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -32,7 +34,30 @@ func (c *Course) IsEmpty() bool {
 var courses []Course
 
 func main() {
+	r := mux.NewRouter()
 
+	courses = append(courses, Course{
+		CourseId:    "1",
+		CourseName:  "React",
+		CoursePrice: 299,
+		Author:      &Author{Fullname: "Ace", Website: "learnreact.com"},
+	})
+	courses = append(courses, Course{
+		CourseId:    "2",
+		CourseName:  "Go",
+		CoursePrice: 199,
+		Author:      &Author{Fullname: "Ace", Website: "learngo.com"},
+	})
+
+	r.HandleFunc("/", serveHome).Methods("GET")
+	r.HandleFunc("/courses", getAllCourses).Methods("GET")
+	r.HandleFunc("/course/{id}", getOneCourse).Methods("GET")
+	r.HandleFunc("/course", createCourse).Methods("POST")
+	r.HandleFunc("/course/{id}", updateCourse).Methods("PUT")
+	r.HandleFunc("/course/{id}", deleteCourse).Methods("DELETE")
+
+	fmt.Println("Server running on PORT: 5000")
+	log.Fatal(http.ListenAndServe(":5000", r))
 }
 
 // controllers
@@ -55,7 +80,6 @@ func getOneCourse(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	json.NewEncoder(w).Encode("No course found with given id")
-	return
 }
 
 func createCourse(w http.ResponseWriter, r *http.Request) {
@@ -80,7 +104,6 @@ func createCourse(w http.ResponseWriter, r *http.Request) {
 	courses = append(courses, course)
 
 	json.NewEncoder(w).Encode(course)
-	return
 }
 
 func updateCourse(w http.ResponseWriter, r *http.Request) {
@@ -105,7 +128,7 @@ func updateCourse(w http.ResponseWriter, r *http.Request) {
 			courses = append(courses[:index], courses[index+1:]...)
 			courseData.CourseId = params["id"]
 			courses = append(courses, courseData)
-			json.NewEncoder(w).Encode(course)
+			json.NewEncoder(w).Encode(courseData)
 			return
 		}
 	}
@@ -123,5 +146,4 @@ func deleteCourse(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	json.NewEncoder(w).Encode("Deleted Successfully")
-	return
 }
