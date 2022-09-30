@@ -1,13 +1,13 @@
-# Basic REST API in GO using gorilla/mux
+# Basic REST API in GO
 
-> Basic REST API in GO using gorilla/mux
+> Basic REST API in GO using gorilla/mux and mongoDB.
 
 ## Build
 ```bash
-# build in current directory
+# build project
 go build .
 
-# build app
+# build app in mac
 GOOS="windows" go build
 GOOS="darwin" go build
 GOOS="linux" go build
